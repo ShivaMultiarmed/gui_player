@@ -11,16 +11,18 @@ import javafx.scene.layout.VBox;
 public class PlayList extends VBox {
     
     public String title;
+    public int id;
     
-    public PlayList (String title)
+    public PlayList (int id, String title)
     {
+        this.id = id;
         
         this.setCustomStyle();
         this.getStyleClass().add("playlist");
         
         try
         {
-            ImageView img = new ImageView(new Image(new FileInputStream("src/gui_player/playlists/"+title+"/preview.png")));
+            ImageView img = new ImageView(new Image(new FileInputStream("src/gui_player/playlists/"+id+"/cover.png")));
             img.setFitHeight(100);
             img.setFitWidth(100);
             this.getChildren().add(img);

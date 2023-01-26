@@ -21,25 +21,21 @@ public class Song extends HBox {
     
     private ImageView img;
     private Label label;
-    private File dir, song, info;
+    private File song;
+    public int trackid;
     
-    public Song(File dir)
+    public Song(int trackid, String playlist, String artist, String title )
     {
+        this.trackid = trackid;
         this.getStyleClass().add("song");
-        this.dir = dir;
         
-        //this.song = new File(dir.toURI()+"song.wav");
+        this.playlist = playlist;
+        this.artist = artist;
+        this.title = title;
         
-        this.info = new File((dir.toURI()+"info.txt").substring(6));
-        
-        String[] str = dir.toURI().toString().split("/");
-        this.playlist = str[str.length-3];
-        
-        this.img = new ImageView(new Image(dir.toURI()+"preview.png"));
+        this.img = new ImageView(new Image(new File("src/gui_player/tracks/"+ trackid +"preview.png").toURI().toString()));
         this.img.setFitHeight(60);
         this.img.setFitWidth(60);
-        
-        this.init_info();
         
         this.set_custom_class();
         
@@ -48,23 +44,7 @@ public class Song extends HBox {
         this.getChildren().add(label);
         
     }
-    private void init_info()
-    {
-        try 
-        {
-            FileReader fr = new FileReader(this.info);      
-            Scanner scanner = new Scanner(fr);
-            this.artist = scanner.nextLine();
-            this.title = scanner.nextLine();
-            fr.close();
-        }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("info file not found");
-        } catch (IOException ex) {
-            System.out.println("i/o issues occured");
-        }
-    }
+    
     private void set_custom_class()
     {
         this.getStyleClass().add("song");

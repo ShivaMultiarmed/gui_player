@@ -5,6 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
@@ -32,6 +37,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Gui_Player extends Application {
     
+    private int userid;
+    
     public boolean play;
     public String playlist, song, artist;
     
@@ -47,12 +54,37 @@ public class Gui_Player extends Application {
     
     private MediaPlayer media_player;
     
+    private Connection connection;
+    private String ip, username, pass, db;
+    
     public static void main(String[] args) {
         launch(args);
     }
     
+    private void setConnection()
+    {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Gui_Player.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        ip = "127.0.0.1"; db = "gui_player"; username = "root"; pass = "my_password#9";
+        
+        try
+        {
+            this.connection  = DriverManager.getConnection("jdbc:mysql://"+ip+":3306/"+db, username, pass);
+        }
+        catch(SQLException ex)
+        {
+            
+        }
+    }
+    
     @Override
     public void start(Stage stage) {
+        
+        this.setConnection();
        
         this.play = false;
         
@@ -141,7 +173,7 @@ public class Gui_Player extends Application {
                 }
         );
         
-        aside = new Aside();
+        aside = new Aside(connection,1);
         root.setLeft(aside);
         
         for (Node p : aside.content.lookupAll(".playlist"))
@@ -154,23 +186,25 @@ public class Gui_Player extends Application {
                     @Override
                     public void handle(MouseEvent e)
                     {
-                        set_Content(pl.title);
+                        set_Content(connection,pl.id);
                     }
                 }
             );
         }
         
-        this.set_Content("rock");
+        this.set_Content(connection, 1);
         
         TheStage.setScene(scene);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         TheStage.show();
         TheStage.setTitle("JAVA Audio Player");
+        
+        //new PlaylistDialog(1);
     }
     
-    private void set_Content(String stringplaylist)
+    private void set_Content(Connection connection, int playlistid)
     {
-        main_content = new Content(stringplaylist);
+        main_content = new Content(connection, playlistid);
         root.setCenter(main_content);
         
         for (Song so : main_content.tracks)
@@ -186,7 +220,7 @@ public class Gui_Player extends Application {
                             artist = so.artist;
                             playlist = so.playlist;
                             
-                            song_file = new File("src/gui_player/playlists/"+playlist+"/songs/"+so.getId()+"/song.mp3");
+                            song_file = new File("src/gui_player/tracks/"+so.trackid+".mp3");
                             if (media_player != null)
                                 media_player.stop();
                                 

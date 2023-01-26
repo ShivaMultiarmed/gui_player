@@ -1,6 +1,12 @@
 package gui_player;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -9,19 +15,18 @@ import javafx.scene.layout.RowConstraints;
 public class Content extends ScrollPane {
     
     public GridPane CONTENT;
-    public int r,c, num;
+    public int r,c, num = 0;
+    private int playlistid;
     public String playlist;
-    public File[] songs;
-    public Song[] tracks;
+    public List<Song> tracks;
     
-    public Content(String playlist) // number of tracks
+    public Content(Connection connection,int playlistid) 
     { 
         CONTENT = new GridPane();
        
-        this.playlist = playlist;
-        this.songs = new File("src/gui_player/playlists/"+playlist+"/songs").listFiles();
+        this.playlistid = playlistid;
+        this.getTracks(connection);
         
-        this.num = this.songs.length;
         c= 2;
         r = (int) Math.ceil(1.0*num/c);
         
@@ -45,15 +50,42 @@ public class Content extends ScrollPane {
         addTracks();
     }
     
+    private void getTracks(Connection connection)
+    {
+        try 
+        {
+            Statement stmt = connection.createStatement();
+            String sql = "SELECT `id`, `title`, `artist` FrOM `tracks`\n" +
+                "INNER JOIN `tracks_in_playlists`\n" +
+                "ON `trackid` = `id`\n" +
+                "WHERE `playlistid` = 1";
+            ResultSet set = stmt.executeQuery(sql);
+            
+            tracks = new ArrayList<Song>();
+            
+            while (set.next())
+            {
+                int songid = set.getInt("id");
+                String title = set.getString("title");
+                String artist = set.getString("artist");
+                Song s = new Song(songid, this.playlist, artist,title);
+                s.setId((num+1)+"");
+                tracks.add(s);
+                num++;
+            }
+
+            set.close();
+            stmt.close();
+        }
+        catch (SQLException ex)
+        {}
+    }
+    
     private void addTracks()
     {
-        tracks = new Song[num];
         for (int i =0;i<num;i++)
         {
-            Song s =new Song(songs[i]);
-            tracks[i] = s;
-            s.setId((i+1)+"");
-            CONTENT.add(s,i%c,i/c);
+            CONTENT.add(tracks.get(i),i%c,i/c);
         }
     }
     private void content_style()
