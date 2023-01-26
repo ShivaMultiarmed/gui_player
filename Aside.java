@@ -1,17 +1,18 @@
 package gui_player;
 
 import java.io.File;
-import javafx.event.EventHandler;
-import javafx.scene.control.Label;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 public class Aside extends ScrollPane {
     
     public VBox content;
     
-    public Aside()
+    public Aside(Connection connection, int userid)
     {
         this.setId("aside");
         
@@ -23,16 +24,26 @@ public class Aside extends ScrollPane {
         content = new VBox();
         this.setContent(content);
         
-        File dir = new File("src/gui_player/playlists/");
-        File[] arr = dir.listFiles();
-        
-        for (File f : arr)
+        try
         {
-            PlayList p = new PlayList(f.getName());
-            content.getChildren().add(p);
-        }
+            Statement stmt = connection.createStatement();
+            ResultSet set=stmt.executeQuery("SELECT * FROM `playlists` WHERE `userid` = " + userid);
+                
+            while (set.next())
+            {
+                int id = set.getInt("id");
+                String title = set.getString("title");
+                PlayList p = new PlayList(id, title);
+                content.getChildren().add(p);
+            }
             
+            set.close();
+            stmt.close();
+        }
+        catch(SQLException ex)
+        {}
         
         content.setSpacing(5);
     }
+    
 }
