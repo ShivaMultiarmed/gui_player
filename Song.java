@@ -33,7 +33,7 @@ public class Song extends HBox {
         this.artist = artist;
         this.title = title;
         
-        this.img = new ImageView(new Image(new File("src/gui_player/tracks/"+ trackid +"preview.png").toURI().toString()));
+        this.img = new ImageView(new Image(new File("src/gui_player/tracks/"+ trackid +"/preview.png").toURI().toString()));
         this.img.setFitHeight(60);
         this.img.setFitWidth(60);
         

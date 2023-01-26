@@ -220,7 +220,7 @@ public class Gui_Player extends Application {
                             artist = so.artist;
                             playlist = so.playlist;
                             
-                            song_file = new File("src/gui_player/tracks/"+so.trackid+".mp3");
+                            song_file = new File("src/gui_player/tracks/"+so.trackid+"/track.mp3");
                             if (media_player != null)
                                 media_player.stop();
                                 

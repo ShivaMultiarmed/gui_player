@@ -58,7 +58,7 @@ public class Content extends ScrollPane {
             String sql = "SELECT `id`, `title`, `artist` FrOM `tracks`\n" +
                 "INNER JOIN `tracks_in_playlists`\n" +
                 "ON `trackid` = `id`\n" +
-                "WHERE `playlistid` = 1";
+                "WHERE `playlistid` =" + playlistid;
             ResultSet set = stmt.executeQuery(sql);
             
             tracks = new ArrayList<Song>();
@@ -68,7 +68,7 @@ public class Content extends ScrollPane {
                 int songid = set.getInt("id");
                 String title = set.getString("title");
                 String artist = set.getString("artist");
-                Song s = new Song(songid, this.playlist, artist,title);
+                Song s = new Song(songid, this.playlist, artist, title);
                 s.setId((num+1)+"");
                 tracks.add(s);
                 num++;
