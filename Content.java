@@ -30,7 +30,8 @@ public class Content extends ScrollPane {
         c= 2;
         r = (int) Math.ceil(1.0*num/c);
         
-        
+        if (r< 5)
+            r =5;
         
         for (int i=0;i<c;i++)
         {

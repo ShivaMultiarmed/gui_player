@@ -78,7 +78,8 @@ public class Gui_Player extends Application {
         TheStage = stage;
         
         TheStage.setWidth(800);
-        TheStage.setHeight(600);
+        TheStage.setHeight(620);
+        TheStage.setResizable(false);
         
         root = new BorderPane();
         root.setId("root");

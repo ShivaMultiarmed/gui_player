@@ -4,8 +4,26 @@
 }
 #header
 {
-    -fx-background-color:#0E2159;
+    -fx-background-color:#fff;
+    
+}
+#playbox
+{
+    -fx-background-color: #0E2159;
     -fx-padding: 10px 0;
+}
+#searchbox
+{
+    -fx-background-color: #cfcfcf;
+    -fx-padding: 10px 0;
+    /*-fx-border-style: hidden hidden solid hidden;
+    -fx-border-width: 1px;
+    -fx-border-color: #888;*/
+    
+}
+#search
+{
+    -fx-highlight-fill: none;
 }
 #play
 {
@@ -16,6 +34,10 @@
 #time
 {
     -fx-pref-width: 500px;
+}
+#timelabel
+{
+    -fx-text-fill: #fff;
 }
 #sound
 {
@@ -115,18 +137,20 @@
 
 .song
 {
-    -fx-border-color: #333;
-    -fx-border-width: 1px;
+    /*-fx-border-color: #333;
+    -fx-border-width: 1px;*/
     -fx-text-fill: #333333;
     -fx-font-size: 18px;
     -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
     -fx-padding: 10px;
+    -fx-background-color: #dfdfdf;
 }
 .song:hover
 {
     
-    -fx-background-color:#eeeeee;
-    -fx-background-radius: 5px;
+    -fx-background-color:#efefef;
+    
     /*-fx-border-style: solid;
     -fx-border-width:2px;
     -fx-border-color:#333333;*/
