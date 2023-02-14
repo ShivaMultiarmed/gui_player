@@ -2,11 +2,7 @@ package gui_player;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,7 +26,7 @@ public class Header extends HBox {
         play = new ImageView();
         play.setId("play");
         try{
-            play.setImage(new Image(new FileInputStream("D:\\NetBeans_Projects\\Gui_Player\\src\\gui_player\\icons\\play.png")));
+            play.setImage(new Image(new FileInputStream("src\\assets\\icons\\play.png")));
         }
         catch(FileNotFoundException e)
         {

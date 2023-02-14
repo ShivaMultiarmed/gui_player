@@ -1,6 +1,5 @@
 package gui_player;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +21,7 @@ public class Aside extends ScrollPane {
         this.fitToWidthProperty().set(true);
         
         content = new VBox();
+        content.getStyleClass().add("container");
         this.setContent(content);
         
         try
@@ -43,7 +43,8 @@ public class Aside extends ScrollPane {
         catch(SQLException ex)
         {}
         
-        content.setSpacing(5);
+        content.setSpacing(15);
+        this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     }
     
 }

@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 
 public class PlayList extends VBox {
     
@@ -20,16 +21,20 @@ public class PlayList extends VBox {
         this.setCustomStyle();
         this.getStyleClass().add("playlist");
         
-        try
-        {
-            ImageView img = new ImageView(new Image(new FileInputStream("src/gui_player/playlists/"+id+"/cover.png")));
-            img.setFitHeight(100);
-            img.setFitWidth(100);
-            this.getChildren().add(img);
-        }
-        catch(FileNotFoundException e)
-        {
-        }
+        
+        ImageView img = new ImageView(new Image("http://guiplayer/playlists/"+id+"/cover.png"));
+        img.setFitHeight(130);
+        img.setFitWidth(img.getFitHeight());
+
+        Rectangle clip = new Rectangle();
+        clip.setWidth(img.getFitWidth());
+        clip.setHeight(img.getFitHeight());
+        clip.setArcHeight(20);
+        clip.setArcWidth(20);
+        img.setClip(clip);
+
+        this.getChildren().add(img);
+        
         this.getChildren().add(new Label(title));
         this.title = title;
     }
