@@ -2,23 +2,45 @@ package gui_player;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 
-public class Header extends HBox {
+public class Header extends VBox {
     
+    public HBox playbox, searchbox;
     public Slider time, sound;
-    public ImageView play;
+    public ImageView play, next, previous, search;
+    public Label timelabel; // time
+    public TextField input;
     
     public Header()
     {
+        playbox = new HBox();
+        playbox.setId("playbox");
+        this.getChildren().add(playbox);
          this.play_init();
+         this.prev_next_init();
          this.time_init();
+         this.label_init();
          this.sound_init();
-         this.customCss();
+         this.playboxCss();
+         
+        searchbox = new HBox();
+        searchbox.setId("searchbox");
+        this.getChildren().add(searchbox);
+        this.input_init();
+        this.search_init();
+        this.searchboxCss();
     }
     
     private void play_init()
@@ -34,7 +56,22 @@ public class Header extends HBox {
         }
         play.setFitWidth(30);
         play.setFitHeight(30);
-        this.getChildren().add(play);
+        playbox.getChildren().add(play);
+    }
+    
+    private void prev_next_init()
+    {
+        try {
+            previous = new ImageView(new Image(new FileInputStream("src/assets/icons/previous.png")));
+            next = new ImageView(new Image(new FileInputStream("src/assets/icons/next.png")));
+            playbox.getChildren().addAll(previous, next);
+            next.setFitHeight(24);
+            next.setFitWidth(24);
+            previous.setFitWidth(24);
+            previous.setFitHeight(24);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Header.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void time_init()
@@ -45,7 +82,14 @@ public class Header extends HBox {
         time.setValue(0);
         time.setId("time");
         
-        this.getChildren().add(time);
+        playbox.getChildren().add(time);
+    }
+    
+    private void label_init()
+    {
+        timelabel = new Label("0:0/2:30");
+        timelabel.setId("timelabel");
+        playbox.getChildren().add(timelabel);
     }
     
     private void sound_init()
@@ -56,11 +100,44 @@ public class Header extends HBox {
         sound.setValue(0.5);
         sound.setId("sound");
         
-        this.getChildren().add(sound);
+        playbox.getChildren().add(sound);
     }
-    private void customCss()
+    private void playboxCss()
     {
-        this.setAlignment(Pos.CENTER);
+        playbox.setAlignment(Pos.CENTER);
+        playbox.setSpacing(10);
     }
     
+    private void input_init()
+    {
+        input = new TextField();
+        input.setPromptText("Введите название песни");
+        input.setId("searchinput"); 
+        input.setPrefWidth(450);
+        input.setPrefHeight(32);
+        searchbox.getChildren().add(input);
+    }
+    private void search_init()
+    {
+        try {
+            search = new ImageView(new Image(new FileInputStream("src\\assets\\icons\\search.png")));
+            search.setFitHeight(32);
+            search.setFitWidth(search.getFitHeight());
+            Rectangle clip = new Rectangle();
+            clip.setWidth(search.getFitWidth());
+            clip.setHeight(search.getFitHeight());
+            clip.setArcHeight(8);
+            clip.setArcWidth(clip.getArcHeight());
+            search.setClip(clip);
+            searchbox.getChildren().add(search);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Header.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    private void searchboxCss()
+    {
+        searchbox.setAlignment(Pos.CENTER);
+        searchbox.setSpacing(10);
+    }
 }
