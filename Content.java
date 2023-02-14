@@ -90,10 +90,13 @@ public class Content extends ScrollPane {
     }
     private void content_style()
     {
-        CONTENT.setId("content");
+        this.setId("content");
         this.fitToWidthProperty().set(true);
         CONTENT.setHgap(10);
         CONTENT.setVgap(10);
+        CONTENT.setId("grid");
+        CONTENT.setMinHeight(this.getPrefHeight());
+        this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     }
     
 }

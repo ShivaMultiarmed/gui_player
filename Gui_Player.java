@@ -3,17 +3,9 @@ package gui_player;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -24,16 +16,15 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import com.mysql.jdbc.Driver;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Gui_Player extends Application {
     
@@ -63,13 +54,9 @@ public class Gui_Player extends Application {
     
     private void setConnection()
     {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Gui_Player.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
-        ip = "127.0.0.1"; db = "gui_player"; username = "root"; pass = "my_password#9";
+        
+        ip = "127.0.0.1"; db = "gui_player"; username = "root"; pass = "";
         
         try
         {
@@ -94,6 +81,7 @@ public class Gui_Player extends Application {
         TheStage.setHeight(600);
         
         root = new BorderPane();
+        root.setId("root");
         scene = new Scene(root);
         
         header = new Header();
@@ -160,7 +148,7 @@ public class Gui_Player extends Application {
                                     media_player.setStartTime(curTime);
                                     s="play";
                                 }
-                                header.play.setImage(new Image(new FileInputStream("D:\\NetBeans_Projects\\Gui_Player\\src\\gui_player\\icons\\"+s+".png")));
+                                header.play.setImage(new Image(new FileInputStream("src\\assets\\icons\\"+s+".png")));
 
                                 System.out.println(play);
                             }
@@ -220,11 +208,16 @@ public class Gui_Player extends Application {
                             artist = so.artist;
                             playlist = so.playlist;
                             
-                            song_file = new File("src/gui_player/tracks/"+so.trackid+"/track.mp3");
+                            try {
+                                song_file = new File(new URL("http://guiplayer/tracks/"+so.trackid+"/track.mp3").getFile());
+                            } catch (MalformedURLException ex) {
+                                Logger.getLogger(Gui_Player.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             if (media_player != null)
-                                media_player.stop();
-                                
-                            set_media_player(song_file.toPath().toString());
+                                media_player.stop();  
+                            
+                            set_media_player();
+                            
                             media_player.play();
                         }
                     }
@@ -232,12 +225,11 @@ public class Gui_Player extends Application {
         }
     }   
     
-    private void set_media_player(String path)
+    private void set_media_player()
     {   
         Slider t = ((Slider)scene.lookup("#time"));
         Slider v = ((Slider)scene.lookup("#sound"));
-        
-        this.media_player = new MediaPlayer(new Media(new File(path).toURI().toString()));
+        this.media_player = new MediaPlayer(new Media("http://guiplayer/"+song_file.toString().replace('\\','/')));
         this.media_player.setStartTime(new Duration(0));
         this.media_player.setVolume(v.getValue());
         
@@ -246,7 +238,7 @@ public class Gui_Player extends Application {
             play = true;
             try
             {
-                header.play.setImage(new Image(new FileInputStream("D:\\NetBeans_Projects\\Gui_Player\\src\\gui_player\\icons\\pause.png")));
+                header.play.setImage(new Image(new FileInputStream("src\\assets\\icons\\pause.png")));
             }
             catch(FileNotFoundException ex)
             {

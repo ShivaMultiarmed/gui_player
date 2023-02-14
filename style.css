@@ -1,3 +1,7 @@
+#root
+{
+    -fx-background-color: #fff;
+}
 #header
 {
     -fx-background-color:#0E2159;
@@ -35,41 +39,95 @@
 
 #aside
 {
-    -fx-padding:5px;
+    -fx-padding:10px;
+    -fx-background-color: #DDD;
+}
+#aside .container
+{
+    -fx-background-color: #DDD;
 }
 #aside .playlist
 {
-    -fx-background-color: #3F5BAC; 
-    -fx-pref-width:150px;
-    -fx-pref-height:150px;/*
-    -fx-border-bottom-color:#fff;
-    -fx-border-bottom-style:solid;
-    -fx-border-bottom-width:3px;*/
-    -fx-border-radius: 10px;
+    -fx-pref-width:170px;
+    -fx-pref-height:170px;
+    -fx-padding: 10px;
 }
-#aside .playlist ImageView
+#aside .playlist:hover
 {
+    -fx-background-color: #EFEFEF;
     -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }
 #aside .playlist Label
 {
-    -fx-text-fill:#fff;
+    -fx-text-fill:#333;
     -fx-font-family: "Tahoma";
     -fx-font-size: 20px;
 }
+
+#aside .scroll-bar:vertical .thumb
+{
+    -fx-background-color: #0E2159;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+#aside .scroll-bar:vertical .track
+
+{
+    -fx-background-color: #ddd;
+    -fx-border-width: 0;
+}
+#aside .scroll-bar:vertical .increment-button, #aside .scroll-bar:vertical .decrement-button, #aside .scroll-bar:vertical .increment-arrow, #aside .scroll-bar:vertical .decrement-arrow
+{
+    -fx-pref-height: 0;
+}
+
 #content
 {
-    -fx-padding: 5px;
+    -fx-padding: 10px;
+    -fx-background-color: #fff;
+}
+#content .content
+{
+    -fx-background-color: #fff;
+}
+#content .scroll-bar:vertical .thumb
+{
+    -fx-background-color: #0E2159;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+#content .scroll-bar:vertical .track
+
+{
+    -fx-background-color: #ddd;
+    -fx-border-width: 0;
+}
+#content .scroll-bar:vertical .increment-button, #content .scroll-bar:vertical .decrement-button, #content .scroll-bar:vertical .increment-arrow, #content .scroll-bar:vertical .decrement-arrow
+{
+    -fx-pref-height: 0;
+}
+#content GridPane
+{
+    -fx-background-color: #fff;
+    -fx-padding: 3px 0;
 }
 
 .song
 {
-    -fx-border-radius: 5px;
-    -fx-background-color:#eeeeee;
+    -fx-border-color: #333;
+    -fx-border-width: 1px;
     -fx-text-fill: #333333;
     -fx-font-size: 18px;
-    -fx-border-style: solid;
-    -fx-border-width:2px;
-    -fx-border-color:#333333;
+    -fx-border-radius: 5px;
     -fx-padding: 10px;
+}
+.song:hover
+{
+    
+    -fx-background-color:#eeeeee;
+    -fx-background-radius: 5px;
+    /*-fx-border-style: solid;
+    -fx-border-width:2px;
+    -fx-border-color:#333333;*/
 }
