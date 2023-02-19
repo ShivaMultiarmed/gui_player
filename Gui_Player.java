@@ -23,15 +23,23 @@ import javafx.util.Duration;
 import com.mysql.jdbc.Driver;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 
 public class Gui_Player extends Application {
     
-    private int userid;
+    private int userid, cur_track_id;
+    
+    private ArrayList<Integer> ids;
     
     public boolean play;
     public String playlist, song, artist;
+    
+    private Duration duration;
     
     public Stage TheStage;
     public BorderPane root;
@@ -48,14 +56,8 @@ public class Gui_Player extends Application {
     private Connection connection;
     private String ip, username, pass, db;
     
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
     private void setConnection()
     {
-        
-        
         ip = "127.0.0.1"; db = "gui_player"; username = "root"; pass = "";
         
         try
@@ -140,25 +142,78 @@ public class Gui_Player extends Application {
                                 if (play)
                                 {
                                     media_player.play();
-                                    s= "pause";
+                                    s = "pause";
                                 }
                                 else
                                 {
-                                    Duration curTime = media_player.getCurrentTime();
-                                    media_player.stop();
-                                    media_player.setStartTime(curTime);
-                                    s="play";
+                                    media_player.pause();
+                                    s = "play";
                                 }
                                 header.play.setImage(new Image(new FileInputStream("src\\assets\\icons\\"+s+".png")));
 
-                                System.out.println(play);
+                                
                             }
                             catch(FileNotFoundException ex)
                             {
                                 System.out.println("File is not found");
                             }
                         }
+                        else if (target.getId() == "next")
+                        {
+                            try
+                            {
+                                set_media_player(ids.get(ids.indexOf(cur_track_id)+1));
+                            }
+                            catch(IndexOutOfBoundsException ex)
+                            {
+                                set_media_player(ids.get(0));
+                            }
+
+                            media_player.play();
+                        }
+                        else if (target.getId() == "previous")
+                        {
+                            try
+                            {
+                                set_media_player(ids.get(ids.indexOf(cur_track_id)-1));
+                            }
+                            catch(IndexOutOfBoundsException ex)
+                            {
+                                set_media_player(ids.get(ids.size()-1));
+                            }
+
+                            media_player.play();
+                        }
+                        else if (target.getId().equals("searchbtn"))
+                        {
+                            main_content = new Content(connection, header.input.getText());
+                            root.setCenter(main_content);
+                        }
                     }
+                    
+                }
+        );
+        
+        ((ImageView)scene.lookup("#next")).addEventHandler(
+                MouseEvent.MOUSE_CLICKED,
+                new EventHandler<MouseEvent>()
+                {
+                    public void handle(MouseEvent e)
+                    {
+                        
+                    }
+                
+                }
+        );
+        ((ImageView)scene.lookup("#previous")).addEventHandler(
+                MouseEvent.MOUSE_CLICKED,
+                new EventHandler<MouseEvent>()
+                {
+                    public void handle(MouseEvent e)
+                    {
+                        
+                    }
+                
                 }
         );
         
@@ -181,7 +236,7 @@ public class Gui_Player extends Application {
             );
         }
         
-        this.set_Content(connection, 1);
+        this.set_Content(connection,1); // fix playlist id according to  a userid
         
         TheStage.setScene(scene);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
@@ -196,8 +251,11 @@ public class Gui_Player extends Application {
         main_content = new Content(connection, playlistid);
         root.setCenter(main_content);
         
+        ids = new ArrayList<Integer>();
+        
         for (Song so : main_content.tracks)
         {
+            ids.add(so.trackid);
             so.addEventHandler(
                     MouseEvent.MOUSE_CLICKED,
                     new EventHandler<MouseEvent>()
@@ -205,20 +263,7 @@ public class Gui_Player extends Application {
                         @Override
                         public void handle(MouseEvent e)
                         {
-                            song = so.title;
-                            artist = so.artist;
-                            playlist = so.playlist;
-                            
-                            try {
-                                song_file = new File(new URL("http://guiplayer/tracks/"+so.trackid+"/track.mp3").getFile());
-                            } catch (MalformedURLException ex) {
-                                Logger.getLogger(Gui_Player.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            if (media_player != null)
-                                media_player.stop();  
-                            
-                            set_media_player();
-                            
+                            set_media_player(so.trackid);
                             media_player.play();
                         }
                     }
@@ -226,13 +271,21 @@ public class Gui_Player extends Application {
         }
     }   
     
-    private void set_media_player()
+    private void set_media_player(int cur_track_id)
     {   
+        this.cur_track_id = cur_track_id;
+        if (media_player != null)
+            media_player.pause(); 
         Slider t = ((Slider)scene.lookup("#time"));
         Slider v = ((Slider)scene.lookup("#sound"));
-        this.media_player = new MediaPlayer(new Media("http://guiplayer/"+song_file.toString().replace('\\','/')));
+        this.media_player = new MediaPlayer(new Media("http://guiplayer/tracks/"+cur_track_id+"/track.mp3"));
         this.media_player.setStartTime(new Duration(0));
         this.media_player.setVolume(v.getValue());
+        
+        Song so = main_content.tracks.get(ids.indexOf(cur_track_id));
+        song = so.title;
+        artist = so.artist;
+        playlist = so.playlist;
         
         if (!play)
         {
@@ -253,14 +306,17 @@ public class Gui_Player extends Application {
                     @Override
                     public void run()
                     {
+                        duration = media_player.getMedia().getDuration();
                         t.setMax(media_player.getMedia().getDuration().toSeconds());
                         media_player.currentTimeProperty().addListener(
                                 new ChangeListener<Duration>()
                                 {
                                     @Override
-                                    public void changed(ObservableValue ov, Duration old, Duration updated)
+                                    public void changed(ObservableValue<? extends Duration> ov, Duration old, Duration updated)
                                     {
                                         header.time.setValue((int)updated.toSeconds());
+                                        String timetext = (int)ov.getValue().toMinutes() + ":" + (int)(ov.getValue().toSeconds()%60) + " / " + (int)duration.toMinutes() + ":" + (int)(duration.toSeconds()%60);
+                                        header.timelabel.setText(timetext);
                                     }
                                 }
                         );

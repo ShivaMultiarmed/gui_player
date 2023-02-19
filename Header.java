@@ -64,6 +64,8 @@ public class Header extends VBox {
         try {
             previous = new ImageView(new Image(new FileInputStream("src/assets/icons/previous.png")));
             next = new ImageView(new Image(new FileInputStream("src/assets/icons/next.png")));
+            previous.setId("previous");
+            next.setId("next");
             playbox.getChildren().addAll(previous, next);
             next.setFitHeight(24);
             next.setFitWidth(24);
@@ -87,7 +89,7 @@ public class Header extends VBox {
     
     private void label_init()
     {
-        timelabel = new Label("0:0/2:30");
+        timelabel = new Label();
         timelabel.setId("timelabel");
         playbox.getChildren().add(timelabel);
     }
@@ -129,6 +131,7 @@ public class Header extends VBox {
             clip.setArcHeight(8);
             clip.setArcWidth(clip.getArcHeight());
             search.setClip(clip);
+            search.setId("searchbtn");
             searchbox.getChildren().add(search);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Header.class.getName()).log(Level.SEVERE, null, ex);
