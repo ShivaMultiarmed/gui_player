@@ -1,11 +1,6 @@
 package gui_player;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -22,6 +17,8 @@ public class Header extends VBox {
     public ImageView play, next, previous, search;
     public Label timelabel; // time
     public TextField input;
+    
+    public Image playImg, pauseImg;
     
     public Header()
     {
@@ -47,13 +44,9 @@ public class Header extends VBox {
     {
         play = new ImageView();
         play.setId("play");
-        try{
-            play.setImage(new Image(new FileInputStream("src\\assets\\icons\\play.png")));
-        }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("file not found");
-        }
+        playImg = new Image("http://somespace.ru/player/assets/icons/play.png");
+        pauseImg = new Image("http://somespace.ru/player/assets/icons/pause.png");
+        play.setImage(playImg);
         play.setFitWidth(30);
         play.setFitHeight(30);
         playbox.getChildren().add(play);
@@ -61,19 +54,15 @@ public class Header extends VBox {
     
     private void prev_next_init()
     {
-        try {
-            previous = new ImageView(new Image(new FileInputStream("src/assets/icons/previous.png")));
-            next = new ImageView(new Image(new FileInputStream("src/assets/icons/next.png")));
-            previous.setId("previous");
-            next.setId("next");
-            playbox.getChildren().addAll(previous, next);
-            next.setFitHeight(24);
-            next.setFitWidth(24);
-            previous.setFitWidth(24);
-            previous.setFitHeight(24);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Header.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        previous = new ImageView(new Image("http://somespace.ru/player/assets/icons/previous.png"));
+        next = new ImageView(new Image("http://somespace.ru/player/assets/icons/next.png"));
+        previous.setId("previous");
+        next.setId("next");
+        playbox.getChildren().addAll(previous, next);
+        next.setFitHeight(24);
+        next.setFitWidth(24);
+        previous.setFitWidth(24);
+        previous.setFitHeight(24);
     }
     
     private void time_init()
@@ -121,22 +110,17 @@ public class Header extends VBox {
     }
     private void search_init()
     {
-        try {
-            search = new ImageView(new Image(new FileInputStream("src\\assets\\icons\\search.png")));
-            search.setFitHeight(32);
-            search.setFitWidth(search.getFitHeight());
-            Rectangle clip = new Rectangle();
-            clip.setWidth(search.getFitWidth());
-            clip.setHeight(search.getFitHeight());
-            clip.setArcHeight(8);
-            clip.setArcWidth(clip.getArcHeight());
-            search.setClip(clip);
-            search.setId("searchbtn");
-            searchbox.getChildren().add(search);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Header.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        search = new ImageView(new Image("http://somespace.ru/player/assets/icons/search.png"));
+        search.setFitHeight(32);
+        search.setFitWidth(search.getFitHeight());
+        Rectangle clip = new Rectangle();
+        clip.setWidth(search.getFitWidth());
+        clip.setHeight(search.getFitHeight());
+        clip.setArcHeight(8);
+        clip.setArcWidth(clip.getArcHeight());
+        search.setClip(clip);
+        search.setId("searchbtn");
+        searchbox.getChildren().add(search);
     }
     private void searchboxCss()
     {

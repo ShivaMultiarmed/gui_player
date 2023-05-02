@@ -1,0 +1,40 @@
+.button
+{
+    -fx-background-color: #0E2159;
+    -fx-text-fill: #fff;
+    -fx-pref-height: 30px;
+    -fx-pref-height: 30px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+.textfield
+{
+    -fx-border-color: #0E2159;
+    -fx-border-width: 2px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+.titleLabel
+{
+    -fx-text-fill: #0E2159;
+    -fx-text-size: 20px;
+}
+.msgLabel
+{
+    -fx-text-fill: #f58442;
+    -fx-text-size: 14px;
+}
+.radio
+{
+    -fx-text-fill: #333;
+    -fx-text-size: 14px;
+    -fx-border-width: 2px;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 10px;
+}
+.radio:hover
+{
+    -fx-border-color: #aaa;
+}

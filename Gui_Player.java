@@ -27,12 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 
 public class Gui_Player extends Application {
     
-    private int userid, cur_track_id;
+    private int userid, cur_track_id, playlist_id;
     
     private ArrayList<Integer> ids;
     
@@ -54,15 +58,22 @@ public class Gui_Player extends Application {
     private MediaPlayer media_player;
     
     private Connection connection;
-    private String ip, username, pass, db;
+    private String host, username, pass, db;
+    
+    
+    public static void main(String[] args)
+    {
+        Gui_Player.launch(args); 
+    }
+   
     
     private void setConnection()
     {
-        ip = "127.0.0.1"; db = "gui_player"; username = "root"; pass = "";
+        host = "server197.hosting.reg.ru"; db = "u1964695_gui_player"; username = "u1964695_default"; pass = "dtjCXRmHMfqR0456";
         
         try
         {
-            this.connection  = DriverManager.getConnection("jdbc:mysql://"+ip+":3306/"+db, username, pass);
+            this.connection  = DriverManager.getConnection("jdbc:mysql://"+host+":3306/"+db, username, pass);
         }
         catch(SQLException ex)
         {
@@ -71,10 +82,14 @@ public class Gui_Player extends Application {
     }
     
     @Override
-    public void start(Stage stage) {
-        
+    public void start(Stage stage)
+    {
         this.setConnection();
-       
+        this.auth(this.connection, stage);
+    }
+    
+    public void openMainWindow(Connection connection, Stage stage) {
+        
         this.play = false;
         
         TheStage = stage;
@@ -90,16 +105,7 @@ public class Gui_Player extends Application {
         header = new Header();
         root.setTop(header);
         
-        ((Slider)scene.lookup("#time")).valueProperty().addListener(
-                new ChangeListener<Number>()
-                {
-                    @Override
-                    public void changed(ObservableValue ov,Number old, Number update)
-                    {
-                        
-                    }
-                }
-        );
+        
         ((Slider)scene.lookup("#time")).addEventHandler(
                 MouseEvent.MOUSE_CLICKED,
                 new EventHandler<MouseEvent>()
@@ -133,29 +139,20 @@ public class Gui_Player extends Application {
                     public void handle(MouseEvent e)
                     {
                         Node target = (Node)(e.getTarget());
+                        if (e.getButton()==MouseButton.PRIMARY){
                         if (target.getId()=="play")
                         {
                             play = !play;
-                            try
+                             
+                            if (play)
                             {
-                                String s = null;
-                                if (play)
-                                {
-                                    media_player.play();
-                                    s = "pause";
-                                }
-                                else
-                                {
-                                    media_player.pause();
-                                    s = "play";
-                                }
-                                header.play.setImage(new Image(new FileInputStream("src\\assets\\icons\\"+s+".png")));
-
-                                
+                                media_player.play();
+                                header.play.setImage(header.pauseImg);
                             }
-                            catch(FileNotFoundException ex)
+                            else
                             {
-                                System.out.println("File is not found");
+                                media_player.pause();
+                                header.play.setImage(header.playImg);
                             }
                         }
                         else if (target.getId() == "next")
@@ -163,6 +160,7 @@ public class Gui_Player extends Application {
                             try
                             {
                                 set_media_player(ids.get(ids.indexOf(cur_track_id)+1));
+                                System.out.println(cur_track_id);
                             }
                             catch(IndexOutOfBoundsException ex)
                             {
@@ -186,40 +184,32 @@ public class Gui_Player extends Application {
                         }
                         else if (target.getId().equals("searchbtn"))
                         {
-                            main_content = new Content(connection, header.input.getText());
-                            root.setCenter(main_content);
+                            set_Content(connection, header.input.getText());
                         }
                     }
-                    
+                    }
                 }
         );
         
-        ((ImageView)scene.lookup("#next")).addEventHandler(
-                MouseEvent.MOUSE_CLICKED,
-                new EventHandler<MouseEvent>()
-                {
-                    public void handle(MouseEvent e)
-                    {
-                        
-                    }
-                
-                }
-        );
-        ((ImageView)scene.lookup("#previous")).addEventHandler(
-                MouseEvent.MOUSE_CLICKED,
-                new EventHandler<MouseEvent>()
-                {
-                    public void handle(MouseEvent e)
-                    {
-                        
-                    }
-                
-                }
-        );
+        setAside();
+        configAllPlaylists();
+        setOnAsideChanged();    
         
-        aside = new Aside(connection,1);
+        this.set_Content(connection, ((PlayList)aside.content.lookup(".playlist")).id); 
+        
+        TheStage.setScene(scene);
+        scene.getStylesheets().add(getClass().getResource("css/main.css").toExternalForm());
+        TheStage.show();
+        TheStage.setTitle("JAVA Audio Player");
+    }
+    
+    private void setAside()
+    {
+        aside = new Aside(connection,userid);
         root.setLeft(aside);
-        
+    }
+    private void configAllPlaylists()
+    {
         for (Node p : aside.content.lookupAll(".playlist"))
         {
             PlayList pl = (PlayList) p;
@@ -230,46 +220,69 @@ public class Gui_Player extends Application {
                     @Override
                     public void handle(MouseEvent e)
                     {
+                        if (e.getButton()==MouseButton.PRIMARY)
+                        {
+                        playlist_id = pl.id;
                         set_Content(connection,pl.id);
+                        }
                     }
                 }
             );
         }
-        
-        this.set_Content(connection,1); // fix playlist id according to  a userid
-        
-        TheStage.setScene(scene);
-        scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-        TheStage.show();
-        TheStage.setTitle("JAVA Audio Player");
-        
-        //new PlaylistDialog(1);
+    }
+    
+    public void setOnAsideChanged()
+    {
+        aside.arePlaylistsChanged.addListener(
+                e -> 
+                {
+                    if (aside.arePlaylistsChanged.get())
+                    {
+                        aside.arePlaylistsChanged.set(false);
+                        configAllPlaylists();
+                    }
+                }
+        );    
     }
     
     private void set_Content(Connection connection, int playlistid)
     {
-        main_content = new Content(connection, playlistid);
+        playlist_id = playlistid;
+        main_content = new Content(connection, userid, playlistid);
+        System.out.println("Initializing playlist " + playlistid);
         root.setCenter(main_content);
+        configTracks();
+        setOnContentChanged();
+    }   
+    
+    private void set_Content(Connection connection, String searchquery)
+    {
+         main_content = new Content(connection,userid, searchquery);
+        root.setCenter(main_content);
+        configTracks();
+    }
+    
+    private void configTracks()
+    {
         
-        ids = new ArrayList<Integer>();
+        ids = new ArrayList<>();
         
         for (Song so : main_content.tracks)
         {
             ids.add(so.trackid);
-            so.addEventHandler(
-                    MouseEvent.MOUSE_CLICKED,
-                    new EventHandler<MouseEvent>()
-                    {
-                        @Override
-                        public void handle(MouseEvent e)
-                        {
-                            set_media_player(so.trackid);
-                            media_player.play();
-                        }
-                    }
-            );
+            System.out.print(ids.get(ids.size()-1));
+            so.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
+                if (e.getButton()==MouseButton.PRIMARY)
+                {
+                set_media_player(so.trackid);
+                media_player.play();
+                }
+                
+            });
         }
-    }   
+       
+        
+    }
     
     private void set_media_player(int cur_track_id)
     {   
@@ -278,7 +291,7 @@ public class Gui_Player extends Application {
             media_player.pause(); 
         Slider t = ((Slider)scene.lookup("#time"));
         Slider v = ((Slider)scene.lookup("#sound"));
-        this.media_player = new MediaPlayer(new Media("http://guiplayer/tracks/"+cur_track_id+"/track.mp3"));
+        this.media_player = new MediaPlayer(new Media("http://somespace.ru/player/tracks/"+cur_track_id+"/track.mp3"));
         this.media_player.setStartTime(new Duration(0));
         this.media_player.setVolume(v.getValue());
         
@@ -290,56 +303,50 @@ public class Gui_Player extends Application {
         if (!play)
         {
             play = true;
-            try
-            {
-                header.play.setImage(new Image(new FileInputStream("src\\assets\\icons\\pause.png")));
-            }
-            catch(FileNotFoundException ex)
-            {
-                System.out.println("File not found");
-            }
+            header.play.setImage(header.pauseImg);
         }
         
-        media_player.setOnReady(
-                new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        duration = media_player.getMedia().getDuration();
-                        t.setMax(media_player.getMedia().getDuration().toSeconds());
-                        media_player.currentTimeProperty().addListener(
-                                new ChangeListener<Duration>()
-                                {
-                                    @Override
-                                    public void changed(ObservableValue<? extends Duration> ov, Duration old, Duration updated)
-                                    {
-                                        header.time.setValue((int)updated.toSeconds());
-                                        String timetext = (int)ov.getValue().toMinutes() + ":" + (int)(ov.getValue().toSeconds()%60) + " / " + (int)duration.toMinutes() + ":" + (int)(duration.toSeconds()%60);
-                                        header.timelabel.setText(timetext);
-                                    }
-                                }
-                        );
-                    }
-                }
-        );
+        media_player.setOnReady(() -> {
+            duration = media_player.getMedia().getDuration();
+            t.setMax(media_player.getMedia().getDuration().toSeconds());
+            media_player.currentTimeProperty().addListener((ObservableValue<? extends Duration> ov, Duration old, Duration updated) -> {
+                header.time.setValue((int)updated.toSeconds());
+                String timetext = (int)ov.getValue().toMinutes() + ":" + (int)(ov.getValue().toSeconds()%60) + " / " + (int)duration.toMinutes() + ":" + (int)(duration.toSeconds()%60);
+                header.timelabel.setText(timetext);
+            });
+        });
     }
     
-    private void set_time_slider()
+    private void setOnContentChanged()
     {
-        Slider t = (Slider) this.header.lookup("#time");
-        
-        t.valueProperty().addListener(
-                new ChangeListener<Number>()
-                {
-                    @Override
-                    public void changed(ObservableValue ov, Number old, Number updated)
+        main_content.areTracksChanged.addListener(
+                value ->{
+                    if (main_content.areTracksChanged.get())
                     {
+                        System.out.println("Tracks have been changed");
                         
+                        System.out.println("Refreshing playlist "+ playlist_id);
+                        set_Content(connection, playlist_id);
+                        main_content.areTracksChanged.set(false);
                     }
                 }
         );
     }
     
-    
+    private void auth(Connection connection, Stage stage)
+    {
+        AuthBox box = new AuthBox(connection);
+            
+        box.userid.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            if (observable.getValue().intValue() > 0)
+            {
+                userid = box.userid.intValue();
+                openMainWindow(connection, stage);
+                box.close();
+            }
+        });
+        
+    }
 }
+
+

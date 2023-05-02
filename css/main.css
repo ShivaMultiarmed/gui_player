@@ -68,23 +68,34 @@
 {
     -fx-background-color: #DDD;
 }
-#aside .playlist
+#aside .playlist, #addPlaylist
 {
     -fx-pref-width:170px;
     -fx-pref-height:170px;
     -fx-padding: 10px;
 }
-#aside .playlist:hover
+#addPlaylist
+{
+    -fx-pref-height: 50px;
+    -fx-background-color: #1f3b8c;
+    -fx-background-radius: 10px;
+}
+
+#aside .playlist:hover, #addPlaylist:hover
 {
     -fx-background-color: #EFEFEF;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
 }
-#aside .playlist Label
+#aside .playlist Label, #addPlaylist Label
 {
     -fx-text-fill:#333;
     -fx-font-family: "Tahoma";
     -fx-font-size: 20px;
+}
+#addPlaylist Label
+{
+    -fx-text-fill: #fff;
 }
 
 #aside .scroll-bar:vertical .thumb
